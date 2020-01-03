@@ -17,12 +17,14 @@ class TripServiceTest {
     private static final User REGISTERED_USER = new User();
     private static final User ANOTHER_USER = new User();
     private static final Trip TO_TRESPADERNE = new Trip();
-    private static  User loggedInUser;
+    private static final Trip TO_BILBAO = new Trip();
+    private User loggedInUser;
     private TripService tripService;
 
     @BeforeEach
     void setUp() {
-        tripService = new TestableTripService();;
+        tripService = new TestableTripService();
+        loggedInUser = REGISTERED_USER;
     }
 
     @Test
@@ -38,15 +40,28 @@ class TripServiceTest {
 
     @Test
     void should_not_return_any_trips_if_users_are_not_friends() {
-        loggedInUser = REGISTERED_USER;
 
-        User friend = new User();
-        friend.addFriend(ANOTHER_USER);
-        friend.addTrip(TO_TRESPADERNE);
+        User friend = new User.UserBuilder()
+                .friendsWith(ANOTHER_USER)
+                .withTrips(TO_TRESPADERNE)
+                .build();
 
         List<Trip> friendsTrips = tripService.getTripsByUser(friend);
 
         assertThat(friendsTrips).isEmpty();
+    }
+
+    @Test
+    void should_return_friend_trips_if_users_are_friends() {
+
+        User friend = new User.UserBuilder()
+                .friendsWith(loggedInUser)
+                .withTrips(TO_TRESPADERNE, TO_BILBAO)
+                .build();
+
+        List<Trip> friendsTrips = tripService.getTripsByUser(friend);
+
+        assertThat(friendsTrips).hasSize(2);
     }
 
     private class TestableTripService extends TripService {
@@ -54,6 +69,10 @@ class TripServiceTest {
         protected User getLoggedInUser() {
             return loggedInUser;
         }
-    }
 
+        @Override
+        protected List<Trip> getTripsBy(User user) {
+            return user.trips();
+        }
+    }
 }
