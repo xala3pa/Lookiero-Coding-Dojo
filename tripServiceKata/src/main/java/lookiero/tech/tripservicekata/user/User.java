@@ -35,6 +35,10 @@ public class User {
         return trips;
     }
 
+    public boolean isFriendOf(User anotherUser) {
+        return friends.contains(anotherUser);
+    }
+
     public static class UserBuilder {
         private User[] friends = new User[]{};
         private Trip[] trips = new Trip[]{};
