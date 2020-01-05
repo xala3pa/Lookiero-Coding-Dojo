@@ -5,10 +5,13 @@ import lookiero.tech.tripservicekata.user.User;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class TripServiceTest {
 
@@ -20,9 +23,11 @@ class TripServiceTest {
     private static final Trip TO_BILBAO = new Trip();
     private TripService tripService;
 
+    TripDAO tripDAOMock = mock(TripDAO.class);
+
     @BeforeEach
     void setUp() {
-        tripService = new TestableTripService();
+        tripService = new TripService(tripDAOMock);
     }
 
     @Test
@@ -53,15 +58,10 @@ class TripServiceTest {
                 .withTrips(TO_TRESPADERNE, TO_BILBAO)
                 .build();
 
+        when(tripDAOMock.findTripsBy(friend)).thenReturn(Arrays.asList(TO_TRESPADERNE, TO_BILBAO));
+
         List<Trip> friendsTrips = tripService.getTripsByUser(friend, REGISTERED_USER);
 
         assertThat(friendsTrips).hasSize(2);
-    }
-
-    private class TestableTripService extends TripService {
-        @Override
-        protected List<Trip> getTripsBy(User user) {
-            return user.trips();
-        }
     }
 }
