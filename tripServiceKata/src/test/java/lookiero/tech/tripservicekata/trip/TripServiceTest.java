@@ -28,10 +28,8 @@ class TripServiceTest {
     @Test
     void
     should_throws_an_exception_when_user_is_not_logged_in() {
-        Exception exception = assertThrows(UserNotLoggedInException.class, () -> {
-
-            tripService.getTripsByUser(UNKNOWN_USER, GUEST);
-        });
+        Exception exception = assertThrows(UserNotLoggedInException.class,
+                () -> tripService.getTripsByUser(UNKNOWN_USER, GUEST));
     }
 
     @Test
